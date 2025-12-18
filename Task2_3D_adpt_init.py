@@ -4,7 +4,7 @@
 import time
 start_time = time.perf_counter()
 import numpy as np
-from scipy.ndimage import gaussian_filter, binary_closing, median_filter
+from scipy.ndimage import gaussian_filter, binary_closing, median_filter, uniform_filter
 from skimage import io, color, transform, filters
 from skimage.morphology import ball
 import matplotlib.pyplot as plt
@@ -99,16 +99,13 @@ def process_image(image_path):
     return final_array
 
 def matrix_adaptive_threshold(matrix):
-    from scipy import ndimage
-    import numpy as np
-
     # parameters
     block_size = 35  # The size of your 3D cube (e.g., 35x35x35)
     sensitivity = 0.95
     offset = 0.02    # Sensitivity adjustment
 
     # Calculate the local mean using a 3D window (cube)
-    local_mean = ndimage.uniform_filter(matrix, size=block_size)
+    local_mean = uniform_filter(matrix, size=block_size)
 
     # Apply threshold
     matrix_adaptive_threshold = matrix > (local_mean * sensitivity - offset)
@@ -136,7 +133,7 @@ plt.show()
 
 # Segment micrograph image
 micrograph_segmented = process_image(image_path)
-micrograph_segmented_porosity = matrix_bin_stats(micrograph_segmented)
+micrograph_segmented_porosity = round(matrix_bin_stats(micrograph_segmented),3)
 
 # Plotting the micrograph_segmented 0-1 array with 0=White and 1=Black
 plt.imshow(micrograph_segmented, cmap='gray_r')
@@ -146,13 +143,17 @@ plt.show()
 
 # ==========================================
 # 1. 3-D matrix (A1) with the same size as that of the original FIB-SEM structure 
-# (1024×899×400 pixels) was generated to represent the membrane (pg 6)
-#
-# # Create the matrix with random 0s and 1s
-# low=0 (inclusive), high=2 (exclusive), so it picks 0 or 1
-A1_matrix = np.random.randint(0, 2, size=(1024, 899, 400), dtype=np.int8) #high is exclusive, =2, 1 included
+#    (1024×899×400 pixels) was generated to represent the membrane (pg 6)
+#    In this case, 3D porosity same % as porosity of 2D input image
 
-matrix_bin_stats(A1_matrix)  # (1024, 899, 400)
+p_zeros = micrograph_segmented_porosity
+shape = (1024, 899, 400)
+
+# If random number is LESS than p_zeros, it becomes a 0.
+# Otherwise, it becomes a 1.
+A1_matrix = (np.random.random(shape) >= p_zeros).astype(np.uint8)
+
+matrix_bin_stats(A1_matrix)
 
 # ==========================================
 # 2. filter (A1) with a 3-D Gaussian smoothing kernel with standard deviation sigma_1 (pg 7)
@@ -173,10 +174,16 @@ matrix_non_bin_stats(A1_matrix_sigma_1)  # (1024, 899, 400)
 # ==========================================
 # 3. second matrix (A2) was generated to account for depth-dependent anisotropy in pore size
 #    with the same dimensions as (A1) (pg 7)
+#    In this case, 3D porosity same % as porosity of 2D input image
 
-A2_matrix = np.random.randint(0, 2, size=(1024, 899, 400), dtype=np.int8) #high is exclusive, =2, 1 included
+p_zeros = micrograph_segmented_porosity
+shape = (1024, 899, 400)
 
-matrix_bin_stats(A2_matrix)  # (1024, 899, 400)
+# If random number is LESS than p_zeros, it becomes a 0.
+# Otherwise, it becomes a 1.
+A2_matrix = (np.random.random(shape) >= p_zeros).astype(np.uint8)
+
+matrix_bin_stats(A2_matrix)
 
 # ==========================================
 # 4. filter (A2) with a 3-D Gaussian smoothing kernel with larger standard deviation sigma_2 
@@ -227,6 +234,8 @@ matrix_non_bin_stats(A_T)
 sigma_T = np.mean([sigma_1, sigma_2])
 A_T_sigma_T = gaussian_filter(A_T.astype(np.float32), sigma=sigma_T)
 A_T_sigma_T = normalize(A_T_sigma_T)
+
+matrix_non_bin_stats(A_T_sigma_T)
 
 # ==========================================
 # 7. Apply adaptive threshold to binarize A_T:
