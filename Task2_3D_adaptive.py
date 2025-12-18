@@ -4,7 +4,7 @@
 import time
 start_time = time.perf_counter()
 import numpy as np
-from scipy.ndimage import gaussian_filter, binary_closing, median_filter
+from scipy.ndimage import gaussian_filter, binary_closing, median_filter, uniform_filter
 from skimage import io, color, transform, filters
 from skimage.morphology import ball
 import matplotlib.pyplot as plt
@@ -99,16 +99,13 @@ def process_image(image_path):
     return final_array
 
 def matrix_adaptive_threshold(matrix):
-    from scipy import ndimage
-    import numpy as np
-
     # parameters
     block_size = 35  # The size of your 3D cube (e.g., 35x35x35)
     sensitivity = 0.95
     offset = 0.02    # Sensitivity adjustment
 
     # Calculate the local mean using a 3D window (cube)
-    local_mean = ndimage.uniform_filter(matrix, size=block_size)
+    local_mean = uniform_filter(matrix, size=block_size)
 
     # Apply threshold
     matrix_adaptive_threshold = matrix > (local_mean * sensitivity - offset)
