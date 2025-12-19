@@ -1,7 +1,5 @@
-Here is a concise `README.md` ready for your hackathon submission.
-
-```markdown
 # Open-Source 3-D Membrane Reconstruction from a Single 2-D FIB-SEM Micrograph
+
 
 A computational framework for reconstructing statistically accurate 3D porous structures from single 2D images using Gaussian Random Fields and validating them via Pore Network Modeling.
 
@@ -37,7 +35,5 @@ H. Chamani, A. Rabbani, K. P. Russell, A. L. Zydney, E. D. Gomez, J. Hattrick-Si
 
 **[2] Dataset:**
 K. P. Brickey, A. L. Zydney, and E. D. Gomez, “FIB-SEM tomography reveals the nanoscale 3D morphology of virus removal filters,” *Journal of Membrane Science*, vol. 640, p. 119766, 2021. Available: https://par.nsf.gov/servlets/purl/10308587
-
-```
 
 ```
