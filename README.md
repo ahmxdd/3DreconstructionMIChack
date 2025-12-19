@@ -28,7 +28,7 @@ python evals.py
 
 ```
 
-## 📚 References
+## References
 
 **[1] Code Implementation:**
 H. Chamani, A. Rabbani, K. P. Russell, A. L. Zydney, E. D. Gomez, J. Hattrick-Simpers, and J. R. Werber, “Rapid reconstruction of 3-D membrane pore structure using a single 2-D micrograph,” *arXiv preprint arXiv:2301.10601*, 2023. Available: https://arxiv.org/abs/2301.10601
